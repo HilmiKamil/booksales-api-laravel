@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,8 +29,13 @@ Route::apiResource('/genres', GenreController::class)->only(['index', 'show']);
 Route::apiResource('/authors', AuthorController::class)->only(['index', 'show']);
 
 //============== Only Admin ===============//
-
 Route::middleware(['auth:api'])->group(function () {
+    // Role Customer
+    Route::middleware(['auth:api', 'role:customer'])->group(function () {
+        // Transaction
+        Route::apiResource('/transactions', TransactionController::class)->only(['update', 'store', 'show']);
+    });
+    //Role Admin
     Route::middleware(['role:admin'])->group(function () {
         //Book
         Route::apiResource('/books', BookController::class)->only(['store', 'update', 'destroy']);
@@ -37,5 +43,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::apiResource('/genres', GenreController::class)->only(['store', 'update', 'destroy']);
         //Author
         Route::apiResource('/authors', AuthorController::class)->only(['store', 'update', 'destroy']);
+        //Transaction
+        Route::apiResource('/transactions', TransactionController::class)->only(['index', 'destroy']);
     });
 });
